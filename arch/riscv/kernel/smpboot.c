@@ -34,6 +34,7 @@
 #include <asm/tlbflush.h>
 #include <asm/sections.h>
 #include <asm/smp.h>
+#include <asm/topology.h>
 #include <uapi/asm/hwcap.h>
 #include <asm/vector.h>
 
@@ -58,6 +59,9 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 	/* This covers non-smp usecase mandated by "nosmp" option */
 	if (max_cpus == 0)
 		return;
+
+	if (IS_ENABLED(CONFIG_RISCV_ISA_SSCUCNT))
+		update_freq_counters_refs();
 
 	for_each_possible_cpu(cpuid) {
 		if (cpuid == curr_cpuid)
@@ -249,6 +253,9 @@ asmlinkage __visible void smp_callin(void)
 		cpuid_to_hartid_map(curr_cpuid));
 
 	set_cpu_online(curr_cpuid, true);
+
+	if (IS_ENABLED(CONFIG_RISCV_ISA_SSCUCNT))
+		update_freq_counters_refs();
 
 	/*
 	 * Remote instruction cache and TLB flushes are ignored while the CPU

@@ -861,6 +861,26 @@ config RISCV_ISA_SVRSW60T59B
 
 	  If you don't know what to do here, say Y.
 
+config RISCV_ISA_SSCUCNT
+	bool "Sscucnt extension support for CPU Utilization Counter"
+	depends on RISCV && GENERIC_ARCH_TOPOLOGY && SMP
+	default y
+	help
+	   Adds support to dynamically detect the presence of the Sscucnt
+	   (CPU Utilization Counter) supervisor-level standard extension and
+	   enable its usage for scheduler frequency invariance (FIE).
+
+	   The Sscucnt extension provides a pair of hardware counters:
+	     - a core-cycles counter tracking actual CPU cycles executed
+	     - a reference-cycles counter running at a fixed frequency
+
+	   When detected at runtime, these counters are used by the task
+	   scheduler to maintain frequency-invariant utilization tracking,
+	   improving EAS (Energy Aware Scheduling) accuracy on systems
+	   with dynamic frequency scaling.
+
+	   If you don't know what to do here, say Y.
+
 config TOOLCHAIN_NEEDS_EXPLICIT_ZICSR_ZIFENCEI
 	def_bool y
 	# https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=aed44286efa8ae8717a77d94b51ac3614e2ca6dc

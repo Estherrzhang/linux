@@ -281,6 +281,8 @@
 #define CSR_HPMCOUNTER29	0xc1d
 #define CSR_HPMCOUNTER30	0xc1e
 #define CSR_HPMCOUNTER31	0xc1f
+#define CSR_CORECYC         0xc30 /* Demo only: CSR address and access method TBD after ARC review */
+#define CSR_ACTTIME         0xc31 /* Demo only: CSR address and access method TBD after ARC review */
 #define CSR_CYCLEH		0xc80
 #define CSR_TIMEH		0xc81
 #define CSR_INSTRETH		0xc82
@@ -313,6 +315,8 @@
 #define CSR_HPMCOUNTER29H	0xc9d
 #define CSR_HPMCOUNTER30H	0xc9e
 #define CSR_HPMCOUNTER31H	0xc9f
+#define CSR_CORECYCH        0xcb0 /* Demo only: CSR address and access method TBD after ARC review */
+#define CSR_ACTTIMEH        0xcb1 /* Demo only: CSR address and access method TBD after ARC review */
 
 #define CSR_SCOUNTOVF		0xda0
 

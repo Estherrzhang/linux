@@ -7,7 +7,9 @@
 
 #include <acpi/cppc_acpi.h>
 #include <asm/csr.h>
+#include <asm/cpufeature.h>
 #include <asm/sbi.h>
+#include <asm/topology.h>
 
 #define SBI_EXT_CPPC 0x43505043
 
@@ -65,11 +67,27 @@ static void sbi_cppc_write(void *write_data)
 static void cppc_ffh_csr_read(void *read_data)
 {
 	struct sbi_cppc_data *data = (struct sbi_cppc_data *)read_data;
+	int cpu = smp_processor_id();
 
 	switch (data->reg) {
-	/* Support only TIME CSR for now */
 	case CSR_TIME:
 		data->ret.value = csr_read(CSR_TIME);
+		data->ret.error = 0;
+		break;
+	case CSR_CORECYC:
+		if (!riscv_cpu_has_extension_likely(cpu, RISCV_ISA_EXT_SSCUCNT)) {
+			data->ret.error = -EINVAL;
+			break;
+		}
+		data->ret.value = get_corecyc();
+		data->ret.error = 0;
+		break;
+	case CSR_ACTTIME:
+		if (!riscv_cpu_has_extension_likely(cpu, RISCV_ISA_EXT_SSCUCNT)) {
+			data->ret.error = -EINVAL;
+			break;
+		}
+		data->ret.value = get_acttime();
 		data->ret.error = 0;
 		break;
 	default:
@@ -91,7 +109,14 @@ static void cppc_ffh_csr_write(void *write_data)
  */
 bool cpc_ffh_supported(void)
 {
-	return true;
+	int cpu;
+
+	for_each_present_cpu(cpu) {
+		if (riscv_cpu_has_extension_likely(cpu, RISCV_ISA_EXT_SSCUCNT))
+			return true;
+	}
+
+	return false;
 }
 
 int cpc_read_ffh(int cpu, struct cpc_reg *reg, u64 *val)
